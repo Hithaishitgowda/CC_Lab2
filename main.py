@@ -56,13 +56,15 @@ def login(request: Request, username: str = Form(...), password: str = Form(...)
     return RedirectResponse(f"/events?user={username}", status_code=302)
 
 
-# ✅ EVENTS OPTIMIZED HERE
+# ❌ EVENTS STILL SLOW (INTENTIONALLY)
 @app.get("/events", response_class=HTMLResponse)
 def events(request: Request, user: str):
     db = get_db()
     rows = db.execute("SELECT * FROM events").fetchall()
 
-    # 🚀 Removed artificial CPU-intensive loop
+    waste = 0
+    for i in range(3000000):
+        waste += i % 3
 
     return templates.TemplateResponse(
         "events.html",
@@ -82,7 +84,7 @@ def register_event(event_id: int, user: str):
     return RedirectResponse(f"/my-events?user={user}", status_code=302)
 
 
-# ❌ MY-EVENTS STILL SLOW (INTENTIONALLY)
+# ✅ MY-EVENTS OPTIMIZED HERE
 @app.get("/my-events", response_class=HTMLResponse)
 def my_events(request: Request, user: str):
     db = get_db()
@@ -96,9 +98,7 @@ def my_events(request: Request, user: str):
         (user,)
     ).fetchall()
 
-    dummy = 0
-    for _ in range(1500000):
-        dummy += 1
+    # 🚀 Removed artificial CPU-intensive loop
 
     return templates.TemplateResponse(
         "my_events.html",
